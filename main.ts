@@ -1,3 +1,9 @@
+function initGameMaster () {
+    basic.showString("Game ready")
+    imposter = players[randint(0, players.length - 1)]
+    radio.sendValue("imposter", imposter)
+    addImposter(imposter)
+}
 input.onButtonPressed(Button.A, function () {
     if (master == 1) {
         for (let index = 0; index <= players.length - 1; index++) {
@@ -7,9 +13,9 @@ input.onButtonPressed(Button.A, function () {
 })
 input.onGesture(Gesture.Shake, function () {
     if (amImposter == 1) {
-    	
+        basic.showString("Imposter")
     } else {
-    	
+        basic.showString("Crewmate")
     }
 })
 function addImposter (num: number) {
@@ -17,18 +23,15 @@ function addImposter (num: number) {
     if (control.deviceSerialNumber() == num) {
         amImposter = 1
     }
+    basic.showString("" + (imposter))
+    basic.showString("" + (amImposter))
 }
 input.onButtonPressed(Button.AB, function () {
     if (join == 1 && master == 1) {
         join = 0
-        initGame()
+        initGameMaster()
     }
 })
-function initGame () {
-    basic.showString("Game ready")
-    imposter = players[randint(0, players.length - 1)]
-    radio.sendValue("imposter", imposter)
-}
 function addPlayer (num: number) {
     if (master == 1) {
         if (players.indexOf(num) == -1) {
