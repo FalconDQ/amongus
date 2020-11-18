@@ -56,6 +56,8 @@ let players: number[] = []
 let master = 0
 let join = 0
 let amImposter = 0
+let player = 0
+amImposter = 0
 amImposter = 0
 join = 0
 master = 0
@@ -66,12 +68,30 @@ if (input.buttonIsPressed(Button.B)) {
     players = []
     master = 1
     players.push(control.deviceSerialNumber())
-    basic.showString("Master - Players can join...")
+    basic.showString("Master - Ready")
     join = 1
 } else {
     basic.showString("Player")
+    player = 1
+    radio.sendValue("hello", control.deviceSerialNumber())
 }
-radio.sendValue("hello", control.deviceSerialNumber())
 basic.forever(function () {
-	
+    if (master == 1) {
+        basic.showLeds(`
+            # . . . #
+            # # . # #
+            # . # . #
+            # . . . #
+            # . . . #
+            `)
+    } else {
+        basic.showLeds(`
+            . # # # .
+            . # . . #
+            . # # # .
+            . # . . .
+            . # . . .
+            `)
+    }
+    basic.pause(2000)
 })
