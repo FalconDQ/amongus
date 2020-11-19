@@ -32,6 +32,16 @@ input.onButtonPressed(Button.AB, function () {
         initGameMaster()
     }
 })
+function initMasterPlayer () {
+    players = []
+    master = 1
+    players.push(control.deviceSerialNumber())
+    basic.showString("Master")
+    join = 1
+}
+function attackNearestPlayer () {
+	
+}
 function addPlayer (num: number) {
     if (master == 1) {
         if (players.indexOf(num) == -1) {
@@ -39,11 +49,18 @@ function addPlayer (num: number) {
         }
     }
 }
-radio.onReceivedString(function (receivedString) {
-	
+input.onButtonPressed(Button.B, function () {
+    if (imposter == 1) {
+        attackNearestPlayer()
+    }
 })
+function initNormalPLayer () {
+    basic.showString("Player")
+    player = 1
+    radio.sendValue("join", control.deviceSerialNumber())
+}
 radio.onReceivedValue(function (name, value) {
-    if (name.compare("hello") == 0) {
+    if (name.compare("join") == 0) {
         addPlayer(value)
     } else {
         if (name.compare("imposter") == 0) {
@@ -51,12 +68,16 @@ radio.onReceivedValue(function (name, value) {
         }
     }
 })
-let imposter = 0
 let players: number[] = []
+let imposter = 0
 let master = 0
 let join = 0
 let amImposter = 0
 let player = 0
+let PlayersSignalStrength: number[] = []
+led.setBrightness(130)
+let initNumLives = 3
+player = 0
 amImposter = 0
 amImposter = 0
 join = 0
@@ -65,16 +86,15 @@ radio.setTransmitSerialNumber(true)
 radio.setTransmitPower(7)
 radio.setGroup(1)
 if (input.buttonIsPressed(Button.B)) {
-    players = []
-    master = 1
-    players.push(control.deviceSerialNumber())
-    basic.showString("Master - Ready")
-    join = 1
+    initMasterPlayer()
 } else {
-    basic.showString("Player")
-    player = 1
-    radio.sendValue("hello", control.deviceSerialNumber())
+    initNormalPLayer()
 }
+game.setLife(initNumLives)
+basic.forever(function () {
+    basic.pause(200)
+    radio.sendValue("hello", 1)
+})
 basic.forever(function () {
     if (master == 1) {
         basic.showLeds(`
