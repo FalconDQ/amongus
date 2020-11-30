@@ -19,10 +19,9 @@ input.onGesture(Gesture.Shake, function () {
     }
 })
 function addNearestPlayer (num: number) {
-    let highestSignal = 0
-    playerIndex = players.indexOf(num)
     if (signalStrength > highestSignal) {
-    	
+        highestSignal = signalStrength
+        closestPlayer = num
     }
 }
 function addImposter (num: number) {
@@ -30,8 +29,6 @@ function addImposter (num: number) {
     if (control.deviceSerialNumber() == num) {
         amImposter = 1
     }
-    basic.showString("" + (imposter))
-    basic.showString("" + (amImposter))
 }
 input.onButtonPressed(Button.AB, function () {
     if (join == 1 && master == 1) {
@@ -47,7 +44,7 @@ function initMasterPlayer () {
     join = 1
 }
 function attackNearestPlayer () {
-	
+    radio.sendValue("kill", closestPlayer)
 }
 function addPlayer (num: number) {
     if (master == 1) {
@@ -57,11 +54,11 @@ function addPlayer (num: number) {
     }
 }
 radio.onReceivedString(function (receivedString) {
-    signalStrength = radio.receivedPacket(RadioPacketProperty.SignalStrength)
+    signalStrength = Math.map(radio.receivedPacket(RadioPacketProperty.SignalStrength), -95, -42, 1, 50)
     addNearestPlayer(radio.receivedPacket(RadioPacketProperty.SerialNumber))
 })
 input.onButtonPressed(Button.B, function () {
-    if (imposter == 1) {
+    if (amImposter == 1) {
         attackNearestPlayer()
     }
 })
@@ -73,22 +70,42 @@ function initNormalPLayer () {
 radio.onReceivedValue(function (name, value) {
     if (name.compare("join") == 0) {
         addPlayer(value)
+    } else if (name.compare("imposter") == 0) {
+        addImposter(value)
+    } else if (name.compare("kill") == 0) {
+        killPlayer(value)
     } else {
-        if (name.compare("imposter") == 0) {
-            addImposter(value)
-        }
+    	
     }
 })
+function killPlayer (player: number) {
+    if (player == control.deviceSerialNumber() && amImposter == 0) {
+        lives += -1
+        for (let index = 0; index < lives; index++) {
+            images.iconImage(IconNames.Heart).scrollImage(1, 200)
+        }
+        if (lives == 0) {
+            dead()
+        }
+    }
+}
+function dead () {
+    while (true) {
+        images.iconImage(IconNames.Sad).showImage(0)
+    }
+}
+let closestPlayer = 0
+let highestSignal = 0
 let signalStrength = 0
-let playerIndex = 0
 let players: number[] = []
 let imposter = 0
 let master = 0
 let join = 0
 let amImposter = 0
 let player = 0
+let lives = 0
 led.setBrightness(130)
-let initNumLives = 3
+lives = 3
 player = 0
 amImposter = 0
 amImposter = 0
@@ -102,11 +119,7 @@ if (input.buttonIsPressed(Button.B)) {
 } else {
     initNormalPLayer()
 }
-game.setLife(initNumLives)
-basic.forever(function () {
-    basic.pause(200)
-    radio.sendString("hello")
-})
+game.setLife(lives)
 basic.forever(function () {
     if (master == 1) {
         basic.showLeds(`
@@ -126,4 +139,8 @@ basic.forever(function () {
             `)
     }
     basic.pause(2000)
+})
+basic.forever(function () {
+    basic.pause(200)
+    radio.sendString("hello")
 })
