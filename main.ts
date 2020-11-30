@@ -18,6 +18,13 @@ input.onGesture(Gesture.Shake, function () {
         basic.showString("Crewmate")
     }
 })
+function addNearestPlayer (num: number) {
+    let highestSignal = 0
+    playerIndex = players.indexOf(num)
+    if (signalStrength > highestSignal) {
+    	
+    }
+}
 function addImposter (num: number) {
     imposter = num
     if (control.deviceSerialNumber() == num) {
@@ -49,6 +56,10 @@ function addPlayer (num: number) {
         }
     }
 }
+radio.onReceivedString(function (receivedString) {
+    signalStrength = radio.receivedPacket(RadioPacketProperty.SignalStrength)
+    addNearestPlayer(radio.receivedPacket(RadioPacketProperty.SerialNumber))
+})
 input.onButtonPressed(Button.B, function () {
     if (imposter == 1) {
         attackNearestPlayer()
@@ -68,13 +79,14 @@ radio.onReceivedValue(function (name, value) {
         }
     }
 })
+let signalStrength = 0
+let playerIndex = 0
 let players: number[] = []
 let imposter = 0
 let master = 0
 let join = 0
 let amImposter = 0
 let player = 0
-let PlayersSignalStrength: number[] = []
 led.setBrightness(130)
 let initNumLives = 3
 player = 0
@@ -93,7 +105,7 @@ if (input.buttonIsPressed(Button.B)) {
 game.setLife(initNumLives)
 basic.forever(function () {
     basic.pause(200)
-    radio.sendValue("hello", 1)
+    radio.sendString("hello")
 })
 basic.forever(function () {
     if (master == 1) {
