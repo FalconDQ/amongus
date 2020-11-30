@@ -1,5 +1,5 @@
 function initGameMaster () {
-    basic.showString("Game ready")
+    basic.showString("READY")
     imposter = players[randint(0, players.length - 1)]
     radio.sendValue("imposter", imposter)
     addImposter(imposter)
@@ -82,7 +82,7 @@ function killPlayer (player: number) {
     if (player == control.deviceSerialNumber() && amImposter == 0) {
         lives += -1
         for (let index = 0; index < lives; index++) {
-            images.iconImage(IconNames.Heart).scrollImage(1, 200)
+            images.iconImage(IconNames.Heart).scrollImage(3, 500)
         }
         if (lives == 0) {
             dead()
